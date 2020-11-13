@@ -2,7 +2,7 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 4</title>
+    <title>Making your first Phaser 3 Game - Part 8</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -33,6 +33,7 @@
     };
 
     var player;
+    var stars;
     var platforms;
     var cursors;
 
@@ -47,8 +48,6 @@
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     }
 
-    var platforms;
-
     function create ()
     {
         this.add.image(400, 300, 'sky');
@@ -60,10 +59,10 @@
         platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
-        
+
         player = this.physics.add.sprite(100, 450, 'dude');
 
-        player.setBounce(1);
+        player.setBounce(0.4);
         player.setCollideWorldBounds(true);
 
         this.anims.create({
@@ -88,7 +87,22 @@
 
         cursors = this.input.keyboard.createCursorKeys();
 
+        stars = this.physics.add.group({
+            key: 'star',
+            repeat: 400,
+            setXY: { x: 12, y: 0, stepX: 3 }
+        });
+
+        stars.children.iterate(function (child) {
+
+            child.setBounceY(Phaser.Math.FloatBetween(0.6, 1));
+
+        });
+
         this.physics.add.collider(player, platforms);
+        this.physics.add.collider(stars, platforms);
+
+        this.physics.add.overlap(player, stars, collectStar, null, this);
     }
 
     function update ()
@@ -118,6 +132,10 @@
         }
     }
 
+    function collectStar (player, star)
+    {
+        star.disableBody(true, true);
+    }
 
 </script>
 
